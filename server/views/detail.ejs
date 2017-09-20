@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>
+    <%= title %>
+  </title>
+  <%- include("layout/jsCss") -%>
+</head>
+
+<body>
+  <!-- 公用header -->
+  <%- include("layout/header") -%>
+    <section id="container" class="container">
+      <div class="main">
+          <div class="detail-info">
+            <ul>
+                <li class="name"><%= res.name %></li>
+                <li>
+                  <img src=<%= res.img %> alt="">
+                </li>
+                <li><%= res.year %><li>
+                <li>
+                    <% res.classify.forEach(function(o,i){ %>
+                    <span><%= o %></span>
+                    <% }) %>
+                <li>
+                <li>
+                    <% res.director.forEach(function(o,i){ %>
+                    <span><%= o %></span>
+                    <% }) %>
+                <li>
+                <li>
+                    <% res.actor.forEach(function(o,i){ %>
+                    <span><%= o %></span>
+                    <% }) %>
+                <li>    
+            </ul>
+            <p><%= res.intro %></p>
+            <% res.url.forEach(function(o,i){ %>
+            <dl>
+              <% o.forEach(function(m,i){ %>
+                <span><%= m.title %></span>
+                <span><%= m.url %></span>
+              <% }) %>
+            </dl>
+            <% }) %>
+        </div>
+      </div>
+    </section>
+    <!-- main JS -->
+    <%- include("layout/mainScript",{name:'home'}) -%>
+</body>
+</html>

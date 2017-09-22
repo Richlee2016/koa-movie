@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>
+    <%= title %>
+  </title>
+  <%- include("layout/jsCss") -%>
+</head>
+
+<body>
+  <!-- 公用header -->
+  <%- include("layout/header") -%>
+    <section id="container" class="container">
+      <div class="main">
+        <ul class="newest movie-list" id="MovieList"></ul>
+        <!-- 分页 -->
+        <%- include("layout/pagination") -%>
+      </div>
+    </section>
+    <!-- main JS -->
+    <%- include("layout/mainScript",{name:'home'}) -%>
+</body>
+</html>

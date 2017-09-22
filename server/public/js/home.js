@@ -63,6 +63,7 @@
 
 	        this.data = JSON.parse($("#DataSet").val());
 	        this.init();
+	        this.bdSet();
 	    }
 
 	    _createClass(Page, [{
@@ -70,6 +71,9 @@
 	        value: function init() {
 	            console.log(this.data);
 	        }
+	    }, {
+	        key: "bdSet",
+	        value: function bdSet() {}
 	    }]);
 
 	    return Page;

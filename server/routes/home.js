@@ -1,18 +1,16 @@
 import { controller, all, post, get } from "../decorator/router";
-import request from "request-promise";
+import * as handle from "../controller/home";
 
 @controller("")
 class Home {
   constructor() {}
   @get("/")
-  async home(ctx, next) {
-    const page = await request(`http://localhost:3000/movie_api/page`);
-    const dataPage = JSON.parse(page);
-    ctx.body = dataPage;
-    if (dataPage.code === 1) {
-      const { data } = dataPage;
+  async getHome(ctx, next) {
+    const res = await handle.home();
+    if (res.code === 1) {
+      const { data } = res;
       await ctx.render("home", {
-        title: "电影家园",
+        title: "熊猫电影",
         name: "",
         banner: data.list.banner,
         data: data.name
@@ -23,19 +21,40 @@ class Home {
   }
 
   @get("/movie/:id")
-  async detail(ctx, next) {
+  async getDetail(ctx, next) {
     const id = ctx.params.id;
-    const movie = await request(`http://localhost:3000/movie_api/movie/${id}`);
-    const data = JSON.parse(movie);
-    if (data.code === 1) {
-      const { id, name } = data;
+    console.log(id);
+    const res = await handle.page(id);
+    if (res.code === 1) {
+      const { id, name } = res.data;
       await ctx.render("detail", {
         title: name,
-        res: data.data,
-        data: { id: 1 }
+        res: res.data,
+        data: { img: res.data.img }
       });
     } else {
       res.send("404 error");
+    }
+  }
+
+  @get("/list")
+  async getList(ctx, next) {
+    const q = ctx.query;
+    await ctx.render("list", {
+      title:q.catalog,
+      data: { query: q }
+    });
+  }
+
+  @post("/pagination")
+  async pagination(ctx, next) {
+    const q = ctx.request.body;
+    const res = await handle.list(q);
+    if (res.code === 1) {
+      const { data } = res;
+      ctx.body = data;
+    } else {
+      ctx.body = '请求错误';
     }
   }
 }

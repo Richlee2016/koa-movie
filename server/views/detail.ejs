@@ -12,38 +12,54 @@
   <!-- 公用header -->
   <%- include("layout/header") -%>
     <section id="container" class="container">
-      <div class="main">
-          <div class="detail-info">
-            <ul>
-                <li class="name"><%= res.name %></li>
-                <li>
-                  <img src=<%= res.img %> alt="">
-                </li>
-                <li><%= res.year %><li>
-                <li>
-                    <% res.classify.forEach(function(o,i){ %>
-                    <span><%= o %></span>
-                    <% }) %>
-                <li>
-                <li>
-                    <% res.director.forEach(function(o,i){ %>
-                    <span><%= o %></span>
-                    <% }) %>
-                <li>
-                <li>
-                    <% res.actor.forEach(function(o,i){ %>
-                    <span><%= o %></span>
-                    <% }) %>
-                <li>    
-            </ul>
-            <p><%= res.intro %></p>
+      <div class="main vivify animationObject">
+          <div class="detail-box">
+            <div class="movie-box">
+                <div class="box-left">
+                    <img src=<%= res.img %> alt="">
+                </div>
+                <ul class="box-right">
+                  <li class="name"><%= res.name %></li>
+                  <li class="year"><label>上映时间：</label><span><%= res.year %></span></li>
+                  <li class="year"><label>地区：</label><span><%= res.area %></span></li>
+                  <li class="classify">
+                      <label>类型：</label>
+                      <% res.classify.forEach(function(o,i){ %>
+                      <span><%= o %></span>
+                      <% }) %>
+                  </li>
+                  <li class="director">
+                      <label>导演：</label>
+                      <% res.director.forEach(function(o,i){ %>
+                      <span><%= o %></span>
+                      <% }) %>
+                  </li>
+                  <li class="actor">
+                      <label>演员：</label>
+                      <% res.actor.forEach(function(o,i){ %>
+                        <% if(i<8){ %>
+                            <span><%= o %></span>
+                        <%  } %>
+                      <% }) %>
+                  </li>    
+                  <li class="actor">
+                      <label>剧情：</label>
+                      <span><%= res.intro.substr(0,70) %>......<a class="look-detail">查看详情</a></span>
+                  </li> 
+                </ul>  
+            </div>
+            
+            <div class="msg-text vivify animationObject">
+              <h3>精彩剧情</h3>
+              <p><%= res.intro %></p>
+            </div>
             <% res.url.forEach(function(o,i){ %>
-            <dl>
+            <div>
               <% o.forEach(function(m,i){ %>
                 <span><%= m.title %></span>
                 <span><%= m.url %></span>
               <% }) %>
-            </dl>
+              </div>
             <% }) %>
         </div>
       </div>

@@ -8,6 +8,7 @@ class Index {
     this.initBd();
     this.searchGo();
     this.pagination();
+    this.animate();
   }
 
   // 设置背景
@@ -47,7 +48,7 @@ class Index {
     const listHtml = list => {
       $("#MovieList").html("");
       list.forEach(o => {
-        $("#MovieList").append(`<li>
+        $("#MovieList").append(`<li class="vivify animationObject popInTop">
                     <a href="movie/${o.id}">
                       <img src=${o.img} alt="">
                       <span class="black-block">${o.year}</span>
@@ -86,6 +87,18 @@ class Index {
       });
     });
   }
+
+  animate(){
+    $('.look-detail').on("click",function(){
+      $(".msg-text").show().addClass('flipInX');
+      $(".msg-text").removeClass('flipOutX');
+    })
+    $(".msg-text h3").on("click",function(){
+      $(".msg-text").removeClass('flipInX');
+      $(".msg-text").addClass('flipOutX');
+    })
+  }
+
 }
 
 const index = new Index();

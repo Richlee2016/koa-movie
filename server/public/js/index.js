@@ -77,6 +77,7 @@
 	      this.initBd();
 	      this.searchGo();
 	      this.pagination();
+	      this.animate();
 	    }
 
 	    // 设置背景
@@ -127,7 +128,7 @@
 	      var listHtml = function listHtml(list) {
 	        $("#MovieList").html("");
 	        list.forEach(function (o) {
-	          $("#MovieList").append("<li>\n                    <a href=\"movie/" + o.id + "\">\n                      <img src=" + o.img + " alt=\"\">\n                      <span class=\"black-block\">" + o.year + "</span>\n                      <!-- <span class=\"black-block\">" + o.score + "</span> -->\n                      <p class=\"black-block\">" + o.name + "</p>\n                    </a>\n                  </li>");
+	          $("#MovieList").append("<li class=\"vivify animationObject popInTop\">\n                    <a href=\"movie/" + o.id + "\">\n                      <img src=" + o.img + " alt=\"\">\n                      <span class=\"black-block\">" + o.year + "</span>\n                      <!-- <span class=\"black-block\">" + o.score + "</span> -->\n                      <p class=\"black-block\">" + o.name + "</p>\n                    </a>\n                  </li>");
 	        });
 	      };
 	      this.ajax(myQs).then(function (res) {
@@ -157,6 +158,18 @@
 	            reject(data);
 	          }
 	        });
+	      });
+	    }
+	  }, {
+	    key: "animate",
+	    value: function animate() {
+	      $('.look-detail').on("click", function () {
+	        $(".msg-text").show().addClass('flipInX');
+	        $(".msg-text").removeClass('flipOutX');
+	      });
+	      $(".msg-text h3").on("click", function () {
+	        $(".msg-text").removeClass('flipInX');
+	        $(".msg-text").addClass('flipOutX');
 	      });
 	    }
 	  }]);
@@ -330,16 +343,16 @@
 				    current_page;
 
 				//goto
-				$(".page-btn").on("click", function () {
+				$(".page-btn").one("click", function () {
 					var allPage = $(".allPage").text();
-					//console.log(allPage);
 					var goPage = $(".page-go input").val() - 1; //跳转页数
 					if (goPage > -1 && goPage < allPage) {
 						opts.current_page = goPage;
+						opts.callback(goPage);
 						$("#Pagination").pagination(allPage, opts);
 					} else {
-						// $("#Pagination").pagination(allPage);
-						alert("超过总页数");
+						$("#Pagination").pagination(allPage);
+						//   alert("超过总页数");
 					}
 					//清空用户跳转页数
 					$(".page-go input").val("");

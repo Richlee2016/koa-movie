@@ -152,16 +152,16 @@ export default function(){
 			renderer, links, current_page;
 
 		//goto
-    $(".page-btn").on("click",function(){
+    $(".page-btn").one("click",function(){
     	var allPage = $(".allPage").text();
-    	//console.log(allPage);
-      var goPage = $(".page-go input").val() - 1; //跳转页数
+	  var goPage = $(".page-go input").val() - 1; //跳转页数
       if(goPage > -1 && goPage < allPage){
 				opts.current_page = goPage;
+				opts.callback(goPage);
       	$("#Pagination").pagination(allPage,opts);
       }else {
-		  // $("#Pagination").pagination(allPage);
-		  alert("超过总页数");
+		  $("#Pagination").pagination(allPage);
+		//   alert("超过总页数");
       }
       //清空用户跳转页数
       $(".page-go input").val("");

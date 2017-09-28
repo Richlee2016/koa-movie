@@ -23,22 +23,10 @@ gulp.task("scripts", () => {
     .pipe(
       gulpWebpack({
         module: {
-          urles: [
-            {
-              test: /\.js$/,
-              loader: "babel-loader",
-              options: {
-                presets: [
-                    "es2015",
-                    "stage-0",
-                ],
-                plugins: [
-                    "transform-runtime",
-                    "transform-async-to-generator"
-                ]
-            }
-            }
-          ]
+          loaders:[{
+            test:/\.js$/,
+            loader:'babel'
+          }]
         }
       }),
       null,
@@ -57,5 +45,5 @@ gulp.task("scripts", () => {
       uglify({ compress: { properties: false }, output: { quote_keys: true } })
     )
     .pipe(gulp.dest("server/public/js"))
-    .pipe(gulpif(args.watch, livereload()));
+    // .pipe(gulpif(args.watch, livereload()));
 });

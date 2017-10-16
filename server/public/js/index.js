@@ -60,14 +60,22 @@
 
 	var _pagination3 = _interopRequireDefault(_pagination2);
 
+	var _domhandle = __webpack_require__(4);
+
+	var dom = _interopRequireWildcard(_domhandle);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	// https://search.bilibili.com/all?keyword=%E5%A4%A7%E6%8A%A4%E6%B3%95&from_source=banner_search
 	var Index = function () {
 	  function Index() {
 	    _classCallCheck(this, Index);
 
+	    this.getdata = JSON.parse($("#DataSet").val());
 	    this.onload();
 	  }
 
@@ -76,19 +84,18 @@
 	    value: function onload() {
 	      this.initBd();
 	      this.searchGo();
-	      this.pagination();
 	      this.animate();
 	    }
-
 	    // 设置背景
 
 	  }, {
 	    key: "initBd",
 	    value: function initBd() {
 	      var url = "/images/test.jpg";
-	      var imgUrl = JSON.parse($("#DataSet").val());
-	      if (imgUrl.img) {
-	        url = imgUrl.img;
+	      var img = this.getdata.img;
+
+	      if (img) {
+	        url = img;
 	      }
 	      $("#container").css({
 	        minHeight: $(document).height(),
@@ -110,7 +117,35 @@
 	        }
 	      });
 	    }
+	    // 请求bili
 
+	  }, {
+	    key: "fetchbili",
+	    value: function fetchbili() {
+	      var _this = this;
+
+	      var name = this.getdata.name;
+
+	      var listHtml = function listHtml(list) {
+	        var self = _this;
+	        $("#Bili").html("");
+	        list.forEach(function (o, i) {
+	          $("#Bili").append(dom.domBili(o));
+	        });
+	        $("#Bili li").each(function (i, o) {
+	          $(o).find(".bili-img").append(dom.domIframe(list[i].img, list[i].av));
+	        });
+	        setTimeout(function () {
+	          $("#Bili li").show().addClass("fadeInBottom");
+	        }, 2000);
+	      };
+	      this.ajax("POST", "/bili", { name: name }).then(function (res) {
+	        console.log(res.data);
+	        listHtml(res.data);
+	      }).catch(function (err) {
+	        console.log(err);
+	      });
+	    }
 	    // 分页器
 
 	  }, {
@@ -118,20 +153,17 @@
 	    value: function pagination() {
 	      var self = this;
 	      (0, _pagination3.default)();
-	      var qs = $("#DataSet").val();
-
-	      var _JSON$parse = JSON.parse(qs),
-	          query = _JSON$parse.query;
+	      var query = this.getdata.query;
 
 	      var myQs = Object.assign({}, query, { page: 1 });
 	      // html替换
 	      var listHtml = function listHtml(list) {
 	        $("#MovieList").html("");
 	        list.forEach(function (o) {
-	          $("#MovieList").append("<li class=\"vivify animationObject popInTop\">\n                    <a href=\"movie/" + o.id + "\">\n                      <img src=" + o.img + " alt=\"\">\n                      <span class=\"black-block\">" + o.year + "</span>\n                      <!-- <span class=\"black-block\">" + o.score + "</span> -->\n                      <p class=\"black-block\">" + o.name + "</p>\n                    </a>\n                  </li>");
+	          $("#MovieList").append(dom.domPage(o));
 	        });
 	      };
-	      this.ajax(myQs).then(function (res) {
+	      this.ajax("POST", "/pagination", myQs).then(function (res) {
 	        listHtml(res.list);
 	        return Promise.resolve(res.count);
 	      }).then(function (count) {
@@ -140,36 +172,48 @@
 	        $("#Pagination").pagination(pageNum, {
 	          callback: function callback(p) {
 	            myQs = Object.assign({}, query, { page: p + 1 });
-	            self.ajax(myQs).then(function (page) {
+	            self.ajax("POST", "/pagination", myQs).then(function (page) {
 	              listHtml(page.list);
 	            });
 	          }
 	        });
 	      });
 	    }
+	    // 请求封装
+
 	  }, {
 	    key: "ajax",
-	    value: function ajax(qs) {
+	    value: function ajax(type, url, qs) {
 	      return new Promise(function (resolve, reject) {
-	        $.post("/pagination", qs, function (data) {
-	          if (data) {
+	        var options = {
+	          type: type,
+	          url: url,
+	          success: function success(data) {
 	            resolve(data);
-	          } else {
-	            reject(data);
+	          },
+	          error: function error(err) {
+	            reject(err);
 	          }
-	        });
+	        };
+	        if (qs) {
+	          options = Object.assign({}, options, { data: qs });
+	        }
+	        $.ajax(options);
 	      });
 	    }
+
+	    // 动画
+
 	  }, {
 	    key: "animate",
 	    value: function animate() {
-	      $('.look-detail').on("click", function () {
-	        $(".msg-text").show().addClass('flipInX');
-	        $(".msg-text").removeClass('flipOutX');
+	      $(".look-detail").on("click", function () {
+	        $(".msg-text").show().addClass("flipInX");
+	        $(".msg-text").removeClass("flipOutX");
 	      });
 	      $(".msg-text h3").on("click", function () {
-	        $(".msg-text").removeClass('flipInX');
-	        $(".msg-text").addClass('flipOutX');
+	        $(".msg-text").removeClass("flipInX");
+	        $(".msg-text").addClass("flipOutX");
 	      });
 	    }
 	  }]);
@@ -178,6 +222,9 @@
 	}();
 
 	var index = new Index();
+	$.extend({
+	  rich: index
+	});
 
 /***/ }),
 /* 3 */
@@ -438,6 +485,33 @@
 				}
 			}; // End of $.fn.pagination block
 		})(jQuery);
+	};
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	// bilibili dom
+	var domBili = exports.domBili = function domBili(o, i) {
+	  return "<li class=\"vivify animationObject\">\n<div class=\"bili-img\"></div>\n<span class=\"time\">" + o.time + "</span>\n<div class=\"bili-info\">\n  <a class=\"title\" href=\"https://www.bilibili.com/video/" + o.av + "/\" target=\"view_window\">\n  <p>" + o.title + "</p>\n  </a>\n  <div>\n    <label>" + o.playTime + "</label>\n    <span>" + o.upTime + "</span>\n  </div>\n  <a class=\"up-zhu\" href=\"https://space.bilibili.com/" + o.upZhu.id + "\" target=\"view_window\">" + o.upZhu.name + "</a>\n</div>\n</li>";
+	};
+
+	// 翻页dom
+	var domPage = exports.domPage = function domPage(o) {
+	  return "<li class=\"vivify animationObject popInTop\">\n<a href=\"movie/" + o.id + "\">\n  <img src=" + o.img + " alt=\"\">\n  <span class=\"black-block\">" + o.year + "</span>\n  <!-- <span class=\"black-block\">" + o.score + "</span> -->\n  <p class=\"black-block\">" + o.name + "</p>\n</a>\n</li>";
+	};
+
+	// 防盗链 iframe
+	var domIframe = exports.domIframe = function domIframe(url, av) {
+	  var frameid = "frameimg" + Math.random();
+	  window.img = "<a href=\"https://www.bilibili.com/video/" + av + "/\" target=\"view_window\"><img id=\"img\" style=\"width:200px;height:120px;\" src='" + url + "?" + Math.random() + "'/></a><script>window.onload = function() { document.body.style.margin=\"0px\"}</script>";
+	  var myimg = "<iframe id=\"" + frameid + "\" src=\"javascript:parent.img;\" frameBorder=\"0\" scrolling=\"no\" width=\"200\" height=\"120\"></iframe>";
+	  return myimg;
 	};
 
 /***/ })

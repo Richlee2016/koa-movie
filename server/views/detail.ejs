@@ -12,7 +12,7 @@
   <!-- 公用header -->
   <%- include("layout/header") -%>
     <section id="container" class="container">
-      <div class="main vivify animationObject">
+      <div class="main vivify animationObject ball">
           <div class="detail-box">
             <div class="movie-box">
                 <div class="box-left">
@@ -50,21 +50,31 @@
             </div>
             
             <div class="msg-text vivify animationObject">
-              <h3>精彩剧情</h3>
+              <h3 class="line-title">精彩剧情</h3>
               <p><%= res.intro %></p>
             </div>
-            <% res.url.forEach(function(o,i){ %>
-            <div>
-              <% o.forEach(function(m,i){ %>
-                <span><%= m.title %></span>
-                <span><%= m.url %></span>
+            <div class="bili-box">
+                <h3 class="line-title">B站锦集</h3>
+                <ul class="bili-block" id="Bili"></ul>
+            </div>
+            <div class="down-url">
+              <h3 class="line-title">下载地址</h3>
+              <% res.url.forEach(function(o,i){ %>
+              <div>
+                <% o.forEach(function(m,i){ %>
+                  <span><%= m.title %></span>
+                  <span><%= m.url %></span>
+                <% }) %>
+                </div>
               <% }) %>
-              </div>
-            <% }) %>
+            </div>
         </div>
       </div>
     </section>
     <!-- main JS -->
     <%- include("layout/mainScript",{name:'home'}) -%>
+    <script>
+      $.rich.fetchbili();
+    </script>
 </body>
 </html>

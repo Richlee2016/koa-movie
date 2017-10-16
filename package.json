@@ -47,6 +47,7 @@
     "gulp-postcss": "^7.0.0",
     "less": "^2.7.2",
     "less-loader": "^4.0.5",
+    "lozad": "^1.0.6",
     "move-js": "^0.5.0",
     "postcss-loader": "^2.0.6",
     "style-loader": "^0.18.2",

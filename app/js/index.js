@@ -1,26 +1,27 @@
 import pagination from "../plugin/pagination";
+import * as dom from "../plugin/domhandle";
+// https://search.bilibili.com/all?keyword=%E5%A4%A7%E6%8A%A4%E6%B3%95&from_source=banner_search
 class Index {
   constructor() {
+    this.getdata = JSON.parse($("#DataSet").val());
     this.onload();
   }
 
   onload() {
     this.initBd();
     this.searchGo();
-    this.pagination();
     this.animate();
   }
-
   // 设置背景
   initBd() {
     let url = "/images/test.jpg";
-    const imgUrl = JSON.parse($("#DataSet").val());
-    if (imgUrl.img) {
-      url = imgUrl.img;
+    const { img } = this.getdata;
+    if (img) {
+      url = img;
     }
     $("#container").css({
-        minHeight:$(document).height(),
-        background:`url('${url}')`
+      minHeight: $(document).height(),
+      background: `url('${url}')`
     });
   }
 
@@ -35,70 +36,98 @@ class Index {
       }
     });
   }
-  
+  // 请求bili
+  fetchbili() {
+    const { name } = this.getdata;
+    const listHtml = list => {
+      const self = this;
+      $("#Bili").html("");
+      list.forEach((o, i) => {
+          $("#Bili").append(dom.domBili(o));
+      });
+      $("#Bili li").each(function(i,o){
+        $(o).find(".bili-img").append(dom.domIframe(list[i].img,list[i].av));
+      })
+      setTimeout(function() {
+        $("#Bili li").show().addClass("fadeInBottom")
+      }, 2000);
+    };
+    this.ajax("POST", "/bili", { name: name })
+      .then(res => {
+        console.log(res.data);
+        listHtml(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
   // 分页器
-  
   pagination() {
     var self = this;
     pagination();
-    const qs = $("#DataSet").val();
-    const { query } = JSON.parse(qs);
+    const { query } = this.getdata;
     let myQs = Object.assign({}, query, { page: 1 });
     // html替换
     const listHtml = list => {
       $("#MovieList").html("");
       list.forEach(o => {
-        $("#MovieList").append(`<li class="vivify animationObject popInTop">
-                    <a href="movie/${o.id}">
-                      <img src=${o.img} alt="">
-                      <span class="black-block">${o.year}</span>
-                      <!-- <span class="black-block">${o.score}</span> -->
-                      <p class="black-block">${o.name}</p>
-                    </a>
-                  </li>`);
+        $("#MovieList").append(dom.domPage(o));
       });
     };
-    this.ajax(myQs).then(res => {
+    this.ajax("POST", "/pagination", myQs)
+      .then(res => {
         listHtml(res.list);
         return Promise.resolve(res.count);
-    })
-    .then(count => {
-        const pageNum = Math.ceil(count/21);
+      })
+      .then(count => {
+        const pageNum = Math.ceil(count / 21);
         $(".allPage").html(pageNum);
-        $("#Pagination").pagination(pageNum,{
-                callback:function(p){
-                    myQs = Object.assign({}, query, { page: p+1 });
-                    self.ajax(myQs).then( page => {
-                      listHtml(page.list);
-                  })
-                }
+        $("#Pagination").pagination(pageNum, {
+          callback: function(p) {
+            myQs = Object.assign({}, query, { page: p + 1 });
+            self.ajax("POST", "/pagination", myQs).then(page => {
+              listHtml(page.list);
             });
-    })
-  }
-
-  ajax(qs) {
-    return new Promise((resolve, reject) => {
-      $.post("/pagination", qs, function(data) {
-        if (data) {
-          resolve(data);
-        } else {
-          reject(data);
-        }
+          }
+        });
       });
+  }
+  // 请求封装
+  ajax(type, url, qs) {
+    return new Promise((resolve, reject) => {
+      let options = {
+        type,
+        url,
+        success: function(data) {
+          resolve(data);
+        },
+        error: function(err) {
+          reject(err);
+        }
+      };
+      if (qs) {
+        options = Object.assign({}, options, { data: qs });
+      }
+      $.ajax(options);
     });
   }
 
-  animate(){
-    $('.look-detail').on("click",function(){
-      $(".msg-text").show().addClass('flipInX');
-      $(".msg-text").removeClass('flipOutX');
-    })
-    $(".msg-text h3").on("click",function(){
-      $(".msg-text").removeClass('flipInX');
-      $(".msg-text").addClass('flipOutX');
-    })
+  // 动画
+  animate() {
+    $(".look-detail").on("click", function() {
+      $(".msg-text")
+        .show()
+        .addClass("flipInX");
+      $(".msg-text").removeClass("flipOutX");
+    });
+    $(".msg-text h3").on("click", function() {
+      $(".msg-text").removeClass("flipInX");
+      $(".msg-text").addClass("flipOutX");
+    });
   }
-
 }
 
 const index = new Index();
+$.extend({
+  rich: index
+});

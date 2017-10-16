@@ -1,6 +1,5 @@
 import { controller, all, post, get } from "../decorator/router";
 import * as handle from "../controller/home";
-
 @controller("")
 class Home {
   constructor() {}
@@ -30,7 +29,7 @@ class Home {
       await ctx.render("detail", {
         title: name,
         res: res.data,
-        data: { img: res.data.img }
+        data: { img: res.data.img,name:name }
       });
     } else {
       res.send("404 error");
@@ -57,4 +56,17 @@ class Home {
       ctx.body = '请求错误';
     }
   }
+
+  @post("/bili")
+  async bili(ctx, next) {
+    const {name} = ctx.request.body;
+    const res = await handle.bili(name);
+    if (res.code === 1) {
+      const { data } = res;
+      ctx.body = res;
+    } else {
+      ctx.body = '请求错误';
+    }
+  }
+
 }
